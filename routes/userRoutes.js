@@ -1,14 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const jwt = require("jsonwebtoken");
 
 // 创建用户
 router.post("/", async (req, res) => {
   try {
     console.log("新增用户user请求体", req.body);
-    // TODO:需要对密码进行哈希处理
     const newUser = new User(req.body);
     const savedUser = await newUser.save();
+
     res.status(200).json({
       userId: savedUser._id,
       userName: savedUser.userName,
@@ -45,6 +46,7 @@ router.get("/", async (req, res) => {
 
 // 更新用户
 router.put("/:id", async (req, res) => {
+  console.log("更新用户信息");
   try {
     const user = await User.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -58,7 +60,7 @@ router.put("/:id", async (req, res) => {
 // 删除用户
 router.delete("/:id", async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.arams.id);
+    await User.findByIdAndDelete(req.params.id);
     res.json({ message: "用户已删除" });
   } catch (err) {
     res.status(404).json({ error: "用户不存在" });
