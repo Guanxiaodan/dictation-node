@@ -2,13 +2,22 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const dayjs = require("dayjs");
 
-// 创建用户
+// 用户注册
 router.post("/", async (req, res) => {
   try {
     console.log("新增用户user请求体", req.body);
+    // 将新用户保存到数据库
     const newUser = new User(req.body);
     const savedUser = await newUser.save();
+    // 生成认证令牌
+    // TODO:生成令牌后，令牌怎么在后端用起来呢
+
+    const token = jwt.sign(
+      { userId: savedUser._id, expirseDate: dayjs().add(1, "year") },
+      process.env.JWT_SECRET
+    );
 
     res.status(200).json({
       userId: savedUser._id,
@@ -16,6 +25,7 @@ router.post("/", async (req, res) => {
       userEmail: savedUser.userEmail,
       createdAt: savedUser.createdAt,
       avatar: savedUser?.avatar || "",
+      token,
     });
   } catch (err) {
     // 错误处理

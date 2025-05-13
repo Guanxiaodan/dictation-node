@@ -1,0 +1,7 @@
+{
+  "watch": ["routes/*", "models/*", "utils/*"],
+  "ignore": [],
+  "ext": "js,json",
+  "exec": "node ./index.js",
+  "delay": "1000"
+}
