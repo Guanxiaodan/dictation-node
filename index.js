@@ -11,7 +11,11 @@ app.use(bodyParser.json()); // 解析JSON请求
 
 // 启动服务器
 const server = app.listen(PORT, () => {
-  console.log(`Node后端服务器已启动 on http://localhost:${PORT}`);
+  console.log(
+    `${dayjs().format(
+      "YYYY-MM-DD HH:mm:ss"
+    )} Node后端服务器已启动 on http://localhost:${PORT}`
+  );
 });
 
 // 连接数据库
@@ -38,4 +42,5 @@ process.on("SIGINT", closeMongoose); // 捕获 Ctrl+C
 
 // 请求路由
 const userRoutes = require("./routes/userRoutes");
+const dayjs = require("dayjs");
 app.use("/api/users", userRoutes);
