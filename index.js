@@ -1,13 +1,20 @@
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
 const PORT = 3001;
-require("dotenv").config();
+const cookieParser = require("cookie-parser");
+const { corsOptions } = require("./constant");
+
+// Express 中优先处理 OPTIONS
+// app.options("*", cors(corsOptions)); // 允许所有路由的 OPTIONS
 
 //中间件配置
-app.use(cors()); // 允许跨域
 app.use(bodyParser.json()); // 解析JSON请求
+app.use(cookieParser()); // 启用 Cookie 解析中间件
+app.use(cors(corsOptions)); // 允许跨域
+// app.options("/api", cors(corsOptions)); // 允许所有路由的 OPTIONS（预检请求）
 
 // 启动服务器
 const server = app.listen(PORT, () => {

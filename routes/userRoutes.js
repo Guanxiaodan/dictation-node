@@ -4,12 +4,15 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const dayjs = require("dayjs");
 const bcrypt = require("bcrypt");
-const { checkPassword } = require("../utils/userVerify");
+const { checkPassword, authenticate } = require("../utils/userVerify");
+const { useClientDomain } = require("../utils");
+const DOMAIN = useClientDomain();
+// 是不是post请求是req.body,get请求是req.params
 
 // API请求正常，数据正常
 const API_CODE = {
   200: "success",
-  403: "API请求正常，数据异常",
+  403: "API请求正常，请求数据异常",
   301: "API请求正常，空数据",
   401: "API请求正常，登录异常",
   500: "服务器出现错误",
@@ -18,7 +21,7 @@ const API_CODE = {
 // 用户注册
 router.post("/signup", async (req, res) => {
   try {
-    console.log("新增用户user请求体", req.body);
+    console.log("新增用户user请求体body", req.body);
     // 密码盐化和哈希加密
     const salt = await bcrypt.genSalt(10);
     req.body.password = await bcrypt.hash(req.body.password, salt);
@@ -26,13 +29,6 @@ router.post("/signup", async (req, res) => {
     // 将新用户保存到数据库
     const newUser = new User({ ...req.body, salt });
     const savedUser = await newUser.save();
-
-    // 生成认证令牌,token在客户端存储，不用存到数据库中
-    // TODO:生成令牌后，令牌怎么在后端用起来呢
-    const token = jwt.sign(
-      { userId: savedUser._id, expirseDate: dayjs().add(1, "year") },
-      process.env.JWT_SECRET
-    );
 
     res.status(200).json({
       message: "success",
@@ -42,11 +38,9 @@ router.post("/signup", async (req, res) => {
         userEmail: savedUser.userEmail,
         createdAt: savedUser.createdAt,
         avatar: savedUser?.avatar || "",
-        token,
       },
     });
   } catch (err) {
-    console.log("err请求出错了", err);
     // 错误处理
     if (err.code === 11000) {
       // MongoDB 唯一索引冲突错误
@@ -79,10 +73,22 @@ router.post("/login", async (req, res) => {
       if (passWordIsRight) {
         // 生成认证令牌,token在客户端存储，不用存到数据库中。TODO:生成令牌后，令牌怎么在后端用起来呢
         const token = jwt.sign(
-          { userId: user._id, expirseDate: dayjs().add(1, "year") },
+          { userId: user._id, exp: dayjs().add(1, "year") },
           process.env.JWT_SECRET
         );
 
+        // TODO: 通过cookie设置token，并在后面的请求中验证token的有效性
+        // 设置 HttpOnly Cookie
+        res.cookie("authToken", token, {
+          httpOnly: true, // 禁止 JS 访问
+          secure: process.env.NODE_ENV === "production", // 仅 HTTPS 传输
+          sameSite: "strict", // 防御 CSRF
+          maxAge: 3600000 * 24 * 365, // 1年有效期（毫秒）
+          path: "/", // 全局路径有效
+          // domain: '.yourdomain.com' // 多子域场景使用
+        });
+
+        // 给前端返回登陆信息
         res.status(200).json({
           message: "success",
           data: {
@@ -112,6 +118,12 @@ router.post("/login", async (req, res) => {
       message: err.message,
     });
   }
+});
+
+// 用户登出
+router.post("/logout", authenticate, (req, res) => {
+  res.clearCookie("authToken");
+  res.status(200).json({ message: "用户已登出" });
 });
 
 // 查询所有用户
@@ -146,5 +158,15 @@ router.delete("/:id", async (req, res) => {
     res.status(404).json({ error: "用户不存在" });
   }
 });
+
+// // 删除用户
+// router.delete("/:id",authenticate, async (req, res) => {
+//   try {
+//     await User.findByIdAndDelete(req.params.id);
+//     res.json({ message: "用户已删除" });
+//   } catch (err) {
+//     res.status(404).json({ error: "用户不存在" });
+//   }
+// });
 
 module.exports = router;
