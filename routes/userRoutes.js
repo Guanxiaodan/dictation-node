@@ -4,8 +4,8 @@ const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const dayjs = require("dayjs");
 const bcrypt = require("bcrypt");
-const { checkPassword, authenticate } = require("../utils/userVerify");
-const { useClientDomain } = require("../utils");
+const { checkPassword, authenticate } = require("../controllers/userVerify");
+const { useClientDomain } = require("../controllers");
 const DOMAIN = useClientDomain();
 // 是不是post请求是req.body,get请求是req.params
 
@@ -73,7 +73,10 @@ router.post("/login", async (req, res) => {
       if (passWordIsRight) {
         // 生成认证令牌,token在客户端存储，不用存到数据库中。TODO:生成令牌后，令牌怎么在后端用起来呢
         const token = jwt.sign(
-          { userId: user._id, exp: dayjs().add(1, "year") },
+          {
+            userId: user._id,
+            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 31,
+          },
           process.env.JWT_SECRET
         );
 

@@ -6,6 +6,7 @@ const app = express();
 const PORT = 3001;
 const cookieParser = require("cookie-parser");
 const { corsOptions } = require("./constant");
+const dayjs = require("dayjs");
 
 // Express 中优先处理 OPTIONS
 // app.options("*", cors(corsOptions)); // 允许所有路由的 OPTIONS
@@ -49,5 +50,6 @@ process.on("SIGINT", closeMongoose); // 捕获 Ctrl+C
 
 // 请求路由
 const userRoutes = require("./routes/userRoutes");
-const dayjs = require("dayjs");
+const studyInfoRoutes = require("./routes/studyInfoRoutes");
 app.use("/api/users", userRoutes);
+app.use("/api/studyInfo", studyInfoRoutes);

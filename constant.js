@@ -1,4 +1,4 @@
-const { useClientDomain } = require("./utils");
+const { useClientDomain } = require("./controllers");
 const corsOptions = {
   origin: useClientDomain(), // 或动态白名单函数
   methods: "GET,POST,PUT,DELETE,OPTIONS",

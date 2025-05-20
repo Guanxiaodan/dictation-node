@@ -10,7 +10,6 @@ async function checkPassword(password, salt, originalPassword) {
 // 认证中间件：从 Cookie 提取token，并判断令牌是否有效
 const authenticate = (req, res, next) => {
   const token = req.cookies.authToken;
-
   // 如果没有种cookie；或者浏览器判断cookie的MaxAge过期了，就不会在请求中携带cookie
   if (!token) {
     return res.status(401).json({ message: "未提供认证令牌，请重新登陆" });
