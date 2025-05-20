@@ -44,9 +44,8 @@ const updateStudyProgress = async (userId, courseId, progressPercent) => {
 const getStudyInfo = async (userId) => {
   try {
     const studyInfo = await StudyInfo.findOne({ userId })
-      .populate("userId", "userName userEmail") // 关联查询用户信息 TODO:populate是干什么的
+      .populate("userId", "userName userEmail") // 数据关联查询，关联查询用户信息 TODO:populate是干什么的
       .lean(); // TODO:lean是干什么的
-    console.log("studyInfo-->", studyInfo);
     if (!studyInfo) throw new Error("学习记录不存在");
     return studyInfo;
   } catch (err) {
