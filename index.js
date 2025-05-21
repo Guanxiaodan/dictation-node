@@ -16,6 +16,8 @@ app.use(bodyParser.json()); // 解析JSON请求
 app.use(cookieParser()); // 启用 Cookie 解析中间件
 app.use(cors(corsOptions)); // 允许跨域
 // app.options("/api", cors(corsOptions)); // 允许所有路由的 OPTIONS（预检请求）
+// 配置静态资源目录，将静态资源目录暴露出去让外部可访问 （Express默认不会暴露静态目录）
+app.use("/uploads", express.static("uploads"));
 
 // 启动服务器
 const server = app.listen(PORT, () => {

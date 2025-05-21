@@ -2,6 +2,7 @@ const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path"); // 是 nodejs 中用于处理文件/目录路径的一个内置模块
 const { log } = require("console");
+// 只是成功将文件存起来了，但是浏览器通过路径拿不到文件，需要解决下。原因：Express默认不会暴露静态目录
 
 // 配置存储规则
 const storage = multer.diskStorage({
