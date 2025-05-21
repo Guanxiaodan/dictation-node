@@ -1,5 +1,11 @@
 {
-  "watch": ["routes/*", "models/*", "utils/*", "index.js"],
+  "watch": [
+    "routes/*",
+    "models/*",
+    "middleware/*",
+    "controllers/*",
+    "index.js"
+  ],
   "ignore": [],
   "ext": "js,json",
   "exec": "node ./index.js",
