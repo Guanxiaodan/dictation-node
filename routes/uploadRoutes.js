@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../middleware/upload");
-const UploadFile = require("../models/UploadFile"); // TODO:这里需要改一下
+const UploadFile = require("../models/UploadFile");
+// TODO:只是把文件上传上来了，但是很多细化的工作还没做，
 
 // 上传音频和文本文件
 router.post(
@@ -25,17 +26,13 @@ router.post(
         return res.status(400).json({ message: "必须上传音频和文本文件" });
       }
       console.log("存储路径 dictationAudio.path-->", dictationAudio.path);
-      // 保存记录到数据库（关联 UserStudyInfo）
+      // 保存记录到数据库（关联 UploadFile）
       const uploadInfo = await UploadFile.create({
-        $push: {
-          materials: {
-            audioPath: dictationAudio.path.replace("public/", ""), // 存储相对路径
-            textPath: dictationText.path.replace("public/", ""),
-            originalNames: {
-              audio: dictationAudio.originalname,
-              text: dictationText.originalname,
-            },
-          },
+        audioPath: dictationAudio.path, // 存储相对路径
+        textPath: dictationText.path,
+        originalNames: {
+          audio: dictationAudio.originalname,
+          text: dictationText.originalname,
         },
       });
 
@@ -53,5 +50,15 @@ router.post(
     }
   }
 );
+
+// 查询所有上传的文件
+router.get("/", async (req, res) => {
+  try {
+    const dictationFiles = await UploadFile.find();
+    res.json(dictationFiles);
+  } catch (err) {
+    res.status(500).json({ error: "查询失败" });
+  }
+});
 
 module.exports = router;

@@ -12,9 +12,9 @@ const storage = multer.diskStorage({
     // 根据文件类型选择存储目录
     let dir = "";
     if (file.fieldname === "dictationAudio") {
-      dir = "public/uploads/audio";
+      dir = "uploads/audio";
     } else if (file.fieldname === "dictationText") {
-      dir = "public/uploads/text";
+      dir = "uploads/text";
     }
     cb(null, dir);
   },
