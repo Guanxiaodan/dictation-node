@@ -51,5 +51,7 @@ process.on("SIGINT", closeMongoose); // 捕获 Ctrl+C
 // 请求路由
 const userRoutes = require("./routes/userRoutes");
 const studyInfoRoutes = require("./routes/studyInfoRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
 app.use("/api/users", userRoutes);
 app.use("/api/studyInfo", studyInfoRoutes);
+app.use("/api/upload", uploadRoutes);
